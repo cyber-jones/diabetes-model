@@ -3,3 +3,4 @@ pandas==2.3.3
 scikit-learn==1.8.0
 joblib==1.5.3
 python-dotenv==1.2.1
+streamlit==1.66.0

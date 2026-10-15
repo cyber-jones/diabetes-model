@@ -6,8 +6,16 @@ import pandas as pd
 from dotenv import load_dotenv
 from joblib import load
 
+load_dotenv()
 
-def predict(model, input_data: dict) -> int:
+PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT"))
+MODEL_PATH = PROJECT_ROOT / os.getenv("MODEL_DIR") / os.getenv("MODEL_NAME")
+
+LOG_PATH = PROJECT_ROOT / os.getenv("LOG_DIR") / os.getenv("LOG_NAME")
+        
+def predict(input_data: dict) -> int:
+    
+    model = load(MODEL_PATH)
     df = pd.DataFrame([input_data])
     predicted_value = model.predict(df)[0]
     return predicted_value
@@ -15,13 +23,6 @@ def predict(model, input_data: dict) -> int:
 
 def main():
     try:
-        load_dotenv()
-
-        PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT"))
-
-        MODEL_PATH = PROJECT_ROOT / os.getenv("MODEL_DIR") / os.getenv("MODEL_NAME")
-        LOG_PATH = PROJECT_ROOT / os.getenv("LOG_DIR") / os.getenv("LOG_NAME")
-
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
         logging.basicConfig(
@@ -32,8 +33,7 @@ def main():
                 logging.FileHandler(LOG_PATH)
             ]
         )
-
-        loaded_model = load(MODEL_PATH)
+        
         logging.info("Model loaded")  # noqa: LOG015
 
         input_data = {
@@ -46,7 +46,8 @@ def main():
             "DiabetesPedigreeFunction": 0.45,
             "Age": 35
         }
-        prediction = predict(model=loaded_model, input_data=input_data)
+        
+        prediction = predict(input_data=input_data)
 
         if prediction == 1:
             print("⚠️ Model predicts: Diabetes")
